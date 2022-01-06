@@ -18,5 +18,6 @@ app.use('/api', routes);
 
 app.listen(PORT, () => {
   debug('listening on port %s', PORT);
+  console.log("App listening on ", PORT);
 });
 module.exports = app;
