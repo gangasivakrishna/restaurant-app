@@ -1,11 +1,56 @@
 const user = require('../models/users');
 const Schema = require('../middleware/schemaValidator.js');
-const { encrypt } = require('../utils/helper');
-const login = async (req, res) => {
+const { encrypt} = require('../utils/helper');
+const {checkUser, addSessionData} = require('../db/dbOperations');
+const {v4: uuidv4} = require('uuid');
+const jwt = require('jsonwebtoken');
+const login = async(req, res) => {
   try {
-    return res.send('login');
+    const payload = req.body;
+    const { username, password } = payload;
+    const isValid = Schema.isLoginSchemaValid(payload);
+    if(!isValid) {
+      const errMsg = {
+        "message": "Invalid login schema",
+        "status": "fail"
+    }
+    return res.send(errMsg);
+    }
+    const isUserExist = await checkUser(username, password);
+    if(!isUserExist){
+      const errMsg = {
+        "message": "Invalid Credentials",
+        "status": "fail"
+      }
+      return res.send(errMsg);
+    }
+    const sessionId = uuidv4();
+    const token = jwt.sign({username: username, sessionId},'secret', {expiresIn:'1hr'});
+    const sessionData = {
+      sessionId,
+      username,
+      token
+    }
+    await addSessionData(sessionData);
+    const response = {
+      "success": true,
+      "data": {
+          "accessToken":token,
+          "sessionId":sessionId,
+          "username": username
+      }
+  }
+    return res.send(response);
   } catch (err) {
-    return res.status(400).send(err);
+    const response = {
+        "success": false,
+        "data": {
+          "errorMessage":"unable to login",
+          "error":err.message
+        }
+    }
+    
+    return res.status(400).send(response);
   }
 };
 
