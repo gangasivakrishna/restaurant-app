@@ -1,4 +1,4 @@
-const getRestaurants = async (req, res) => {
+  const getRestaurants = async (req, res) => {
   try {
     return res.send('get restaurants');
   } catch (err) {
@@ -8,7 +8,9 @@ const getRestaurants = async (req, res) => {
 
 const addRestaurant = async (req, res) => {
   try {
-    return res.send('add restaurants');
+    const payload = req.body;
+    await db.addRestaurant(payload);
+    return res.send('restaurants');
   } catch (err) {
     return res.status(400).send(err);
   }

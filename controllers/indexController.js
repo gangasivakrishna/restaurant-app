@@ -1,12 +1,14 @@
 const user = require('../models/users');
 const Schema = require('../middleware/schemaValidator.js');
 const { encrypt} = require('../utils/helper');
-const {checkUser, addSessionData} = require('../db/dbOperations');
+const {checkUser} = require('../db/userOps');
+const {addSessionData} = require('../db/sessionOps');
 const {v4: uuidv4} = require('uuid');
 const jwt = require('jsonwebtoken');
 const login = async(req, res) => {
   try {
     const payload = req.body;
+    console.log("🚀 ~ file: indexController.js ~ line 11 ~ login ~ payload", payload)
     const { username, password } = payload;
     const isValid = Schema.isLoginSchemaValid(payload);
     if(!isValid) {
@@ -17,6 +19,7 @@ const login = async(req, res) => {
     return res.send(errMsg);
     }
     const isUserExist = await checkUser(username, password);
+    console.log("🚀 ~ file: indexController.js ~ line 22 ~ login ~ isUserExist", isUserExist)
     if(!isUserExist){
       const errMsg = {
         "message": "Invalid Credentials",

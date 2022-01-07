@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const user = require('../models/users');
-const session = require('../models/sessions');
+
 const checkUser = async (username, password) => {
   const result = await user.find({ username: username });
 
@@ -12,11 +12,7 @@ const checkUser = async (username, password) => {
   }
   return false;
 };
-const addSessionData = async (sessionData) => {
-  const newSession = new session(sessionData);
-  await newSession.save();
-};
+
 module.exports = {
-  checkUser,
-  addSessionData,
+  checkUser
 };
